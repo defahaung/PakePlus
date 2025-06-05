@@ -1,22 +1,2141 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <link rel="stylesheet" href="styles.css" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>PakePlus App</title>
-        <script type="module" src="/main.js" defer></script>
-    </head>
+﻿<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8" />
+    <!--<meta name="viewport" content="width=device-width,initial-scale=1.0" />-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <title>SCOP计算</title>
+    <style>
+        html {
+            width: 920px;/*原1200*/
+            margin: auto;
+            background: #F0F3F5;
+            background-image: url('images/20250329.jpg');
+            text-align: center; /*文本居中、子元素居中*/
+        }
 
-    <body>
-        <main class="container">
-            <h1>Welcome to PakePlus</h1>
+        body {
+            margin: 1em;
+            border: solid;
+            border-radius: 20px;
+            box-shadow: 0px 0px 0.8em #CCC;
+            border-width: 30px; /*配合透明线条可更改边距*/
+            border-color: rgba(255,255,255,1);
+            background: rgba(255,255,255,1); /*整个网页背景*/
+            font-family: Cambria Math; /*整个字体类型*/
+            color: #000; /*整个字体颜色*/
+            backdrop-filter: blur(25px); /* 毛玻璃模糊效果 */
+        }
 
-            <form class="row" id="greet-form">
-                <input id="greet-input" placeholder="Enter a name..." />
-                <button type="submit">Greet</button>
-            </form>
-            <p id="greet-msg"></p>
-        </main>
-    </body>
+        h1 { /*大标题*/
+            margin-top: -20px; /*元素往上移动*/
+        }
+        h3 { /*副标题*/
+            margin-top: -20px;
+        }
+
+        td, th { /*单元格通用格式*/
+            border: solid;
+            border-width: 1px; /*表格线框粗细*/
+            border-color: #BBB; /*表格线框颜色*/
+            padding: 3px;
+            height: 15px; /*单元格、输入框、选择框高度*/
+            /*box-sizing: border-box;*/
+        }
+          abbr {
+            text-decoration: none;/*提示去掉下划线*/
+        }
+
+        .tr1 {
+            font-size: 16px;
+        }
+
+        .trload {  /*部分负荷*/   
+            color: #55F;
+        }
+
+        table { /*表格通用格式*/
+            width: 100%;
+            margin-top: 10px; /*相对于上一个元素往下移动距离*/
+            table-layout: fixed; /*启用固定布局，禁用会影响手机布局,空单元格会缩小*/
+            border-collapse: collapse; /*合并边框*/
+            white-space: nowrap; /*禁止文字换行*/
+        }
+
+        .table1 {
+            color: #000;
+            margin-top: -10px;
+            font-size: 22px;
+        }
+        .table2 {
+            color: #000;
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        .table3 {
+            color: #000;
+            margin-top: 1em;
+            font-size: 18px;
+        }
+        .table4 {
+            color: #666;
+            margin-top: 1em;
+            font-size: 16px;
+        }
+        .table5 {
+            color: #666;
+            margin-top: 1em;
+            font-size: 16px;
+        }
+        .tr1-table { /*表头部分*/
+            color: #000;
+            background: #EEE;
+        }
+        .tr0-table { /*表头结果*/
+            height:50px;
+        }
+        .tr1unit { /*表头单位*/
+            font-size: 16px;
+            color: #888;
+        }
+
+        .tr2-table { /*表头部分*/
+            color: #000;
+            background: #EEE;
+
+        }
+        .tr2unit { /*表头单位*/
+            font-size: 12px;
+            color: #888;
+        }
+
+        .tr3-table { /*表头部分*/
+            color: #000;
+            background: #EEE;
+        }
+        .tr3unit { /*表头单位*/
+            font-size: 12px;
+            color: #888;
+        }
+
+        .tr4-table { /*表头部分*/
+            color: #000;
+            background: #EEE;
+        }
+        .tr4unit { /*表头单位*/
+            font-size: 12px;
+            color: #888;
+        }
+        .tr5-table { /*表头部分*/
+            color: #000;
+            background: #EEE;
+        }
+        .tr5unit { /*表头单位*/
+            font-size: 12px;
+            color: #888;
+        }
+
+        input00 { /*输入框样式*/
+            border: inset;
+            width: 90%;
+            height: 65%;
+            font-size: 1em;
+            background: #EEE; /*输入框背景色*/
+            text-align: center;
+            /*border: none;去掉输入框边框*/
+            border-color: #EEE;
+        }
+       input{
+           outline: none;
+           border:1px none #888;
+           color: #107C10;
+           width:92%;
+           font-family:cambria;
+           height:84%;
+           text-align:center;
+           background:#FFF;
+           box-shadow: inset 1px 1px 2px #888;
+           border-radius: 4px;
+           font-size: 16px;
+           transition: all 0.5s ease;
+       }
+       input:hover{
+           background:#aaf;
+           color: #ff0;
+           box-shadow: 1px 1px 2px #888;
+           border-radius: 10px;
+       }
+       input:focus{
+           color: #000;
+           background:linear-gradient(to right, #eeF , #FFF, #Fee);
+       }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+        }
+
+        div { /*进度条总样式*/
+            margin-top: 5px;
+            width: 100%;
+        }
+        .bt { /*进度条按钮*/
+            color:#548978;
+            width: 96%;
+            margin: auto;
+            margin-top: 20px;
+            border-width: 1px;
+            border-radius: 10px;
+            font-size: 1.3em;
+            display: flex;
+            justify-content: space-between;
+            box-shadow: 0px 0px 8px #888;
+            font-weight: bold;
+            height:80px;
+            background:#FFF;
+            /*background:linear-gradient(to right, #EEF , #FFF, #FDD);*/
+        }
+
+        #calculate,#save {/*计算按钮样式*/
+            margin-top: 15px;
+            margin-right: 15px;
+            margin-left: 15px;
+            width: 160px;
+            height: 70px;
+            font-size: 1.4em;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;/*光标移动到元素上变为手型光标*/
+            transition: background-color 1s ease, color 1s ease;
+            transition: all 0.5s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 3px 3px 10px #888;
+            background:linear-gradient(#84fab0 , #FFF, #ffd1fF);   
+            animation: pulse 2s infinite;
+            }
+
+        #calculate:hover,#save:hover {/*悬停效果*/
+            transform: translateY(-3px);
+            border-radius: 50%;
+            background-color: #red;
+            color: #888;
+            transition: all 0.5s ease;
+            }
+
+            #calculate:active, #save:active { /*点击效果*/
+                transform: translateY(5px);
+                color: #EEE;
+                box-shadow: 0 1px 5px #888;
+                transition: all 0.1s ease;
+            }
+
+        #bt1,#bt3 { /*进度条*/
+            font-size: 18px;
+            width: 5%;
+            padding:15px;
+        }
+
+        meter { /*进度条*/
+            /*appearance: none;禁用默认样式*/
+            width: 83%;
+            margin: auto;
+            height: 50px;
+        }
+
+        meter::-webkit-meter-bar {
+                    background: #FFF;
+        }
+        meter::-webkit-meter-optimum-value {
+                    background: linear-gradient(to right, #84fab0 , #FFF, #ffd1fF); 
+                    transition: all 2s ease;
+        }
+        #sel2 { /*气候选择*/
+            width: 96%;
+            border-color: #888;
+            color: #107C10;
+            font-size: 16px;
+            height: 90%;
+            text-align: center;
+        }
+
+        .input { /*应用选择——容器样式*/
+            display: flex;
+            margin: auto;
+            border-radius: 5px;
+            text-shadow: 0px 0px 0px #888;
+            width:95%;
+            height: 90%;
+        }
+        #sel { /*应用选择——输入框样式*/
+            display: none; /*none flex去掉默认样式*/
+            width: 80%;
+            border: 1px solid #888;
+            background: #4c31fa;
+        }
+
+        label::after { /*背景文字*/
+            content: "低温应用";
+            pointer-events: none;
+            color: #ada6ff;
+            display: flex;
+            align-items: center; /*垂直居中*/
+            font-size: 16px;
+            transform: translateX(54px);
+            z-index: 1; /* 设置文字的堆叠顺序 */
+            transition: all 1s ease;
+        }
+
+        #sel:checked + label::after { /*切换后，背景文字*/
+            content: "  中温应用";
+            color: #ff7c7cff;
+            text-align: center;
+            display: flex;
+            transform: translateX(6px);
+            transition: all 1s ease;
+        }
+
+        label::before { /*切换前，滑块样式*/
+            font-size: 10px;
+            content: "35℃";
+            border-radius: 50px;
+            width: 42px;
+            height: 23px;
+            position: absolute;
+            font-size: 14px;
+            left: 5%;
+            top: 50%; /*滑块起始位置*/
+            transform: translateY(-50%);
+            background: #ada6ffff;
+            box-shadow: 4px 2px 2px #888;
+            transition: all 1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2; /* 设置滑块的堆叠顺序，使其高于文字 */
+        }
+
+        #sel:checked + label::before { /*切换后，滑块样式*/
+            content: "55℃";
+            background: #ff7c7c;
+            transform: translate(70px, -50%);
+            box-shadow: -4px 2px 2px #888;
+            transition: all 1s ease;
+        }
+
+        label { /*切换前，滑块背景*/
+            display: inline-block; /*切换为块*/
+            position: relative; /* 为 label 设置相对定位，作为 label::before 的包含块 */
+            margin: auto;
+            display: flex;
+            align-items: center; /*垂直居中*/
+            border-radius: 50px;
+            width: 100%;
+            height: 88%;
+            background: #FFF;
+            box-shadow: inset 3px 3px 3px #BBB, inset -3px -3px 3px #eee;
+            transition: all 0.5s ease;
+        }
+        #sel:checked + label { /*切换后，背景*/
+            box-shadow: inset -3px 3px 3px #BBB, inset 3px 3px 3px #eee;
+            transition: all 0.5s ease;
+            display: flex;
+            align-items: center; /*垂直居中*/
+        }
+
+    </style>
+</head>
+
+<body>
+    <div><h1>SCOP计算 </h1></div>
+    <div><h3>依据《 EN 14825-2022 》标准 </h3></div>
+
+    <table class="table1">
+        <!--最终计算-->
+        <tbody>
+            <tr class="tr1-table">
+                <th>SCOP<br /><span class="tr1unit">kWh/kWh</span></th>
+                <th>SCOP<sub>on</sub><br /><span class="tr1unit">kWh/kWh</span></th>
+                <th>SCOP<sub>net</sub><br /><span class="tr1unit">kWh/kWh</span></th>
+                <th><abbr title="参考年供暖需求">Q<sub>H</sub><br /><span class="tr1unit">kWh</span></abbr></th>
+                <th><abbr title="供暖年能耗">Q<sub>HE</sub><br /><span class="tr1unit">kWh</span></abbr></th>
+                <th>η<sub>s,h</sub></th>
+                <th>能效等级<br /></th>
+            </tr>
+            <tr class="tr0-table">
+                <td class="td1" id="SCOP" height: 40px;></td>
+                <td class="td1" id="SCOPon"></td>
+                <td class="td1" id="SCOPnet"></td>
+                <td class="td1" id="QH"></td>
+                <td class="td1" id="QHE"></td>
+                <td class="td1" id="η"></td>
+                <td class="td1" id="level"></td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="bt">
+        <span id="bt1"><span id="Aupn"></span><br /><span id="Aup"></span></span>   
+        <meter id="meter1" class="meter1" value="0" min="" max=""></meter>   
+        <span id="bt3"><span id="Adownn"></span><br /><span id="Adown"></span></span>
+    </div>
+
+        <table class="table2">
+            <!--用户输入-->
+            <tbody>
+                <tr class="tr2-table">
+                    <th>机组型号</th><!--（如未测试，默认0.9）-->
+                    <th>T<sub>biv</sub><br /><span class="tr2unit">℃</span></th>
+                    <th>P<sub>designh</sub><br /><span class="tr2unit">kW</th>
+                    <th>应用类型<br /></th>
+                    <th>气候类型<br /></th>
+                    <th>计算日期<br /></th>
+                </tr>
+                <tr>
+                    <td><input id="model" type="text"></td>
+                    <td><input id="Tbiv" type="number"  value="-7"></td>
+                    <!--<td><input id="Pdesignh" type="number" value="5.868"></td>需要用户输入时使用-->
+                    <td id="Pdesignh"></td><!--自动计算时使用-->
+                    <td>
+                        <div class="input">
+                          <input id="sel" class="border border-gray-300 p-2 rounded" type="checkbox">
+                          <label for="sel"></label>
+                          <!--<option value="option1">中温（55℃）</option>
+        <option value="option2" selected>低温（35℃）</option>
+    </input>-->
+                        </div>
+                    </td>
+                    <td>
+                        <select id="sel2" class="sel">
+                            <option value="option1">温暖（2℃）</option>
+                            <option value="option2" selected>平均（-7℃）</option>
+                            <option value="option2">寒冷（-22℃）</option>
+                        </select>
+                    </td>
+                    <td id="local-time" "></td>
+                </tr>
+            </tbody>
+
+            <tbody>
+                <tr class="tr2-table"><!--标题行-->
+                    <th></th>
+                    <th><strong>制热量</br></strong><span class="tr2unit">kW</span></th>
+                    <th><strong>COP</br></strong><span class="tr2unit">kW/kW</span></th>
+                    <th><abbr title="衰减系数"><strong>Cd</strong></abbr></th>
+                    <th><strong>要求负荷</strong></th>
+                    <th class="trload"><strong>实际负荷</strong></th>
+                </tr>
+
+                <tr class="tr1"><!--A行-->  
+                    <td>A<br /><span class="tr2unit">-7 ℃ / -8 ℃</span></td>
+                    <td><input id="heatA" type="number" value="7.528"></td>
+                    <td><input id="COPA" type="number" value="2.29"></td>
+                    <td><input id="CdA" type="number" oninput="let val = parseFloat(this.value); if (isNaN(val)) return; if (val < 0) this.value = 0; else if (val > 1) this.value = 1;" value="0.9"></td>
+                    <td>88.46%</td>
+                    <td id="loadA" class="trload"></td>
+                </tr>
+
+                <tr class="tr1"><!--B行-->
+                    <td id="">B<br /><span class="tr2unit">2 ℃ / 1 ℃</span></td>
+                   <td><input id="heatB" type="number" value="4.725"></td>
+                    <td><input id="COPB" type="number" value="3.56"></td>
+                    <td><input id="CdB" type="number" oninput="let val = parseFloat(this.value); if (isNaN(val)) return; if (val < 0) this.value = 0; else if (val > 1) this.value = 1;" value="0.9"></td>
+                    <td>53.85%</td>
+                    <td id="loadB" class="trload"></td>
+                </tr>
+
+                <tr class="tr1"><!--C行-->
+                    <td id="">C<br /><span class="tr2unit">7 ℃ / 6 ℃</span></td>
+                    <td><input id="heatC" type="number" value="3.032"></td>
+                    <td><input id="COPC" type="number" value="5.08"></td>
+                    <td><input id="CdC" type="number" oninput="let val = parseFloat(this.value); if (isNaN(val)) return; if (val < 0) this.value = 0; else if (val > 1) this.value = 1;" value="0.9"></td>
+                    <td>34.62%</td>
+                    <td id="loadC" class="trload"></td>
+                </tr>
+
+                <tr class="tr1"><!--D行-->
+                    <td id="">D<br /><span class="tr2unit">12 ℃ / 11 ℃</span></td>
+                    <td><input id="heatD" type="number" value="3.046"></td>
+                    <td><input id="COPD" type="number" value="7.94"></td>
+                    <td><input id="CdD" type="number" oninput="let val = parseFloat(this.value); if (isNaN(val)) return; if (val < 0) this.value = 0; else if (val > 1) this.value = 1;" value="0.9"></td>
+                    <td>15.38%</td>
+                    <td id="loadD" class="trload"></td>
+                </tr>
+
+                <tr class="tr1"><!--E行-->
+                    <td>E<br /><span class="tr2unit">-10 ℃ / -11 ℃</span></td>
+                    <td><input id="heatE" type="number" value="7.296"></td>
+                    <td><input id="COPE" type="number" value="2.05"></td>
+                    <td><input id="CdE" type="number" oninput="let val = parseFloat(this.value); if (isNaN(val)) return; if (val < 0) this.value = 0; else if (val > 1) this.value = 1;" value="0.9"></td>
+                    <td>100%</td>
+                    <td id="loadE" class="trload"></td>
+                </tr>
+
+                <tr class="tr1"><!--F行-->
+                    <td>F<br /><span class="tr2unit">-7 ℃ / -8 ℃</span></td>
+                    <td id="heatF"></td>
+                    <td id="COPF"></td>
+                    <td id="CdF"></td>
+                    <td>88.46%</td>
+                    <td id="loadF" class="trload"></td>
+                </tr>
+            </tbody>
+
+            <tbody>
+<!--待机模式等-->
+                <tr class="tr2-table">
+
+                    <th><abbr title="温控关闭模式输入功率">P<sub>TO</sub><br /><span class="tr2unit">W</span></abbr></th>
+                    <th><abbr title="待机模式输入功率">P<sub>SB</sub><br /><span class="tr2unit">W</span></abbr></th>
+                    <th><abbr title="曲轴加热模式输入功率">P<sub>CK</sub><br /><span class="tr2unit">W</span></abbr></th>
+                    <th><abbr title="关机模式输入功率">P<sub>OFF</sub><br /><span class="tr2unit">W</span></abbr></th>
+                </tr>
+                <tr>
+                    <td><input id="PTO" type="number" value="14"></td>
+                    <td><input id="PSB" type="number" value="14"></td>
+                    <td><input id="PCK" type="number" value="50"></td>
+                    <td><input id="POFF" type="number" value="14"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div>
+          <button id="calculate">计算</button>
+          <button id="save">保存</button>
+        </div>
+
+        <table class="table3">
+            <!--过程计算-->
+            <tbody>
+                <tr class="tr3-table">
+                    
+
+                    <th><abbr title="制热等效运行小时数">H<sub>HE</sub><br /><span class="tr3unit">h</span></abbr></th>
+                    <th>H<sub>TO</sub><br /><span class="tr3unit">h</span></th>
+                    <th>H<sub>SB</sub><br /><span class="tr3unit">h</span></th>
+                    <th><abbr title="曲轴加热模式小时数">H<sub>CK</sub><br /><span class="tr3unit">h</span></abbr></th>
+                    <th>H<sub>OFF</sub><br /><span class="tr3unit">h</span></th>
+                </tr>
+                <tr>
+
+
+                    <td id="HHE">2066</td>
+                    <td id="HTO">178</td>
+                    <td id="HSB">0</td>
+                    <td id="HCK">178</td>
+                    <td id="HOFF">0</td>
+                </tr>
+            </tbody>
+
+        </table>
+
+        <table class="table4">
+            <!--COP修正-->
+            <tbody>
+                <tr class="tr4-table">
+                    <th>部分负荷<br /></th>
+                    <th><abbr title="修正后的COP">COP<sub>bin</sub>(T<sub>j</sub>)<br /><span class="tr4unit">kW/kW</span></abbr></th>
+                    <th><abbr title="未修正的COP">COP<sub>d</sub><br /><span class="tr4unit">kW/kW</span></abbr></th>
+                    <th><abbr title="容量比">CR</abbr></th>
+                    <th><abbr title="负荷率">pl(T<sub>j</sub>)<br /><span class="tr4unit">%</span></abbr></th>
+                    <th><abbr title="声明容量">Pdh<br /><span class="tr4unit">kW</span></abbr></th>
+
+                </tr>
+                <tr>
+                    <td id="A">A</td>
+                    <td id="COPbinTjA"></td>
+                    <td id="COPdA"></td>
+                    <td id="CRA"></td>
+                    <td id="plTjA"></td>
+                    <td id="PdhA"></td>
+                </tr>
+                <tr>
+                    <td id="B">B</td>
+                    <td id="COPbinTjB"></td>
+                    <td id="COPdB"></td>
+                    <td id="CRB"></td>
+                    <td id="plTjB"></td>
+                    <td id="PdhB"></td>
+                </tr>
+                <tr>
+                    <td id="C">C</td>
+                    <td id="COPbinTjC"></td>
+                    <td id="COPdC"></td>
+                    <td id="CRC"></td>
+                    <td id="plTjC"></td>
+                    <td id="PdhC"></td>
+                </tr>
+                <tr>
+                    <td id="D">D</td>
+                    <td id="COPbinTjD"></td>
+                    <td id="COPdD"></td>
+                    <td id="CRD"></td>
+                    <td id="plTjD"></td>
+                    <td id="PdhD"></td>
+                </tr>
+                <tr>
+                    <td id="E">E</td>
+                    <td id="COPbinTjE"></td>
+                    <td id="COPdE"></td>
+                    <td id="CRE"></td>
+                    <td id="plTjE"></td>
+                    <td id="PdhE"></td>
+                </tr>
+                <tr>
+                    <td id="F">F</td>
+                    <td id="COPbinTjF"></td>
+                    <td id="COPdF"></td>
+                    <td id="CRF"></td>
+                    <td id="plTjF"></td>
+                    <td id="PdhF"></td>
+                </tr>
+            </tbody>
+
+        </table>
+        <table class="table5">
+            <!--每个表格从table开始，tr 行数，td 列数，th 标题-->
+            <tbody>
+                <!--详细数据-->
+
+                <tr class="tr5-table">
+                    <th>室外温度<br />T<sub>j</sub><br /><span class="tr5unit">℃</span></th>
+
+                    <th><abbr title="小时数（平均）">h<sub>jA</sub><br /><span class="tr5unit">h</span></abbr></th>
+
+                    <th>年供暖需求<br /><span class="tr5unit">kWh</span></th>
+
+                    <th>年能量输入<br /></th>
+
+                    <th>负荷率<br />pl(T<sub>j</sub>)<br /><span class="tr5unit">%</span></th>
+
+                    <th>部分负荷<br />P<sub>h</sub>(T<sub>j</sub>)<br /><span class="tr5unit">kW</span></th>
+
+                    <th>电辅容量<br />elbu(T<sub>j</sub>)<br /><span class="tr5unit">kW</span></th>
+
+                    <th>制热量<br /><span class="tr5unit">kW</span></th>
+
+                    <th>COP<sub>bin</sub>(T<sub>j</sub>)<br /><span class="tr5unit">W/W</span></th>
+                </tr>
+
+
+
+                <tr>
+                    <td>-10</td>
+                    <td>1</td>
+                    <td id="need010"></td><!--年供暖需求-->
+                    <td id="energy010"></td><!--年能量输入-->
+                    <td id="load_ratio010"></td><!--负荷率-->
+                    <td id="load010"></td><!--负荷-->
+                    <td id="elbu010"></td><!--电辅容量-->
+                    <td id="heat010"></td><!--E 制热量-->
+                    <td id="COP010"></td>
+                </tr>
+
+                <tr>
+                    <td>-9</td>
+                    <td>25</td>
+                    <td id="need09"></td>
+                    <td id="energy09"></td>
+                    <td id="load_ratio09"></td><!--负荷率-->
+                    <td id="load09"></td><!--负荷-->
+                    <td id="elbu09"></td><!--电辅容量-->
+                    <td id="heat09"></td>
+                    <td id="COP09"></td>
+                </tr>
+                <tr>
+                    <td>-8</td>
+                    <td>23</td>
+                    <td id="need08"></td>
+                    <td id="energy08"></td>
+                    <td id="load_ratio08"></td><!--负荷率-->
+                    <td id="load08"></td><!--负荷-->
+                    <td id="elbu08"></td><!--电辅容量-->
+                    <td id="heat08"></td>
+                    <td id="COP08"></td>
+                </tr>
+                <tr>
+                    <td>-7</td>
+                    <td>24</td>
+                    <td id="need07"></td>
+                    <td id="energy07"></td>
+                    <td id="load_ratio07"></td><!--负荷率-->
+                    <td id="load07"></td><!--负荷-->
+                    <td id="elbu07"></td><!--电辅容量-->
+                    <td id="heat07"></td>
+                    <td id="COP07"></td>
+                </tr>
+                <tr>
+                    <td>-6</td>
+                    <td>27</td>
+                    <td id="need06"></td>
+                    <td id="energy06"></td>
+                    <td id="load_ratio06"></td><!--负荷率-->
+                    <td id="load06"></td><!--负荷-->
+                    <td id="elbu06"></td><!--电辅容量-->
+                    <td id="heat06"></td>
+                    <td id="COP06"></td>
+                </tr>
+                <tr>
+                    <td>-5</td>
+                    <td>68</td>
+                    <td id="need05"></td>
+                    <td id="energy05"></td>
+                    <td id="load_ratio05"></td><!--负荷率-->
+                    <td id="load05"></td><!--负荷-->
+                    <td id="elbu05"></td><!--电辅容量-->
+                    <td id="heat05"></td>
+                    <td id="COP05"></td>
+                </tr>
+                <tr>
+                    <td>-4</td>
+                    <td>91</td>
+                    <td id="need04"></td>
+                    <td id="energy04"></td>
+                    <td id="load_ratio04"></td><!--负荷率-->
+                    <td id="load04"></td><!--负荷-->
+                    <td id="elbu04"></td><!--电辅容量-->
+                    <td id="heat04"></td>
+                    <td id="COP04"></td>
+                </tr>
+                <tr>
+                    <td>-3</td>
+                    <td>89</td>
+                    <td id="need03"></td>
+                    <td id="energy03"></td>
+                    <td id="load_ratio03"></td><!--负荷率-->
+                    <td id="load03"></td><!--负荷-->
+                    <td id="elbu03"></td><!--电辅容量-->
+                    <td id="heat03"></td>
+                    <td id="COP03"></td>
+                </tr>
+                <tr>
+                    <td>-2</td>
+                    <td>165</td>
+                    <td id="need02"></td>
+                    <td id="energy02"></td>
+                    <td id="load_ratio02"></td><!--负荷率-->
+                    <td id="load02"></td><!--负荷-->
+                    <td id="elbu02"></td><!--电辅容量-->
+                    <td id="heat02"></td>
+                    <td id="COP02"></td>
+                </tr>
+                <tr>
+                    <td>-1</td>
+                    <td>173</td>
+                    <td id="need01"></td>
+                    <td id="energy01"></td>
+                    <td id="load_ratio01"></td><!--负荷率-->
+                    <td id="load01"></td><!--负荷-->
+                    <td id="elbu01"></td><!--电辅容量-->
+                    <td id="heat01"></td>
+                    <td id="COP01"></td>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>240</td>
+                    <td id="need0"></td>
+                    <td id="energy0"></td>
+                    <td id="load_ratio0"></td><!--负荷率-->
+                    <td id="load0"></td><!--负荷-->
+                    <td id="elbu0"></td><!--电辅容量-->
+                    <td id="heat0"></td>
+                    <td id="COP0"></td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>280</td>
+                    <td id="need1"></td>
+                    <td id="energy1"></td>
+                    <td id="load_ratio1"></td><!--负荷率-->
+                    <td id="load1"></td><!--负荷-->
+                    <td id="elbu1"></td><!--电辅容量-->
+                    <td id="heat1"></td>
+                    <td id="COP1"></td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>320</td>
+                    <td id="need2"></td>
+                    <td id="energy2"></td>
+                    <td id="load_ratio2"></td><!--负荷率-->
+                    <td id="load2"></td><!--负荷-->
+                    <td id="elbu2"></td><!--电辅容量-->
+                    <td id="heat2"></td>
+                    <td id="COP2"></td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>357</td>
+                    <td id="need3"></td>
+                    <td id="energy3"></td>
+                    <td id="load_ratio3"></td><!--负荷率-->
+                    <td id="load3"></td><!--负荷-->
+                    <td id="elbu3"></td><!--电辅容量-->
+                    <td id="heat3"></td>
+                    <td id="COP3"></td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>356</td>
+                    <td id="need4"></td>
+                    <td id="energy4"></td>
+                    <td id="load_ratio4"></td><!--负荷率-->
+                    <td id="load4"></td><!--负荷-->
+                    <td id="elbu4"></td><!--电辅容量-->
+                    <td id="heat4"></td>
+                    <td id="COP4"></td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>303</td>
+                    <td id="need5"></td>
+                    <td id="energy5"></td>
+                    <td id="load_ratio5"></td><!--负荷率-->
+                    <td id="load5"></td><!--负荷-->
+                    <td id="elbu5"></td><!--电辅容量-->
+                    <td id="heat5"></td>
+                    <td id="COP5"></td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>330</td>
+                    <td id="need6"></td>
+                    <td id="energy6"></td>
+                    <td id="load_ratio6"></td><!--负荷率-->
+                    <td id="load6"></td><!--负荷-->
+                    <td id="elbu6"></td><!--电辅容量-->
+                    <td id="heat6"></td>
+                    <td id="COP6"></td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td>326</td>
+                    <td id="need7"></td>
+                    <td id="energy7"></td>
+                    <td id="load_ratio7"></td><!--负荷率-->
+                    <td id="load7"></td><!--负荷-->
+                    <td id="elbu7"></td><!--电辅容量-->
+                    <td id="heat7"></td>
+                    <td id="COP7"></td>
+                </tr>
+                <tr>
+                    <td>8</td>
+                    <td>348</td>
+                    <td id="need8"></td>
+                    <td id="energy8"></td>
+                    <td id="load_ratio8"></td><!--负荷率-->
+                    <td id="load8"></td><!--负荷-->
+                    <td id="elbu8"></td><!--电辅容量-->
+                    <td id="heat8"></td>
+                    <td id="COP8"></td>
+                </tr>
+                <tr>
+                    <td>9</td>
+                    <td>335</td>
+                    <td id="need9"></td>
+                    <td id="energy9"></td>
+                    <td id="load_ratio9"></td><!--负荷率-->
+                    <td id="load9"></td><!--负荷-->
+                    <td id="elbu9"></td><!--电辅容量-->
+                    <td id="heat9"></td>
+                    <td id="COP9"></td>
+                </tr>
+                <tr>
+                    <td>10</td>
+                    <td>315</td>
+                    <td id="need10"></td>
+                    <td id="energy10"></td>
+                    <td id="load_ratio10"></td><!--负荷率-->
+                    <td id="load10"></td><!--负荷-->
+                    <td id="elbu10"></td><!--电辅容量-->
+                    <td id="heat10"></td>
+                    <td id="COP10"></td>
+                </tr>
+                <tr>
+                    <td>11</td>
+                    <td>215</td>
+                    <td id="need11"></td>
+                    <td id="energy11"></td>
+                    <td id="load_ratio11"></td><!--负荷率-->
+                    <td id="load11"></td><!--负荷-->
+                    <td id="elbu11"></td><!--电辅容量-->
+                    <td id="heat11"></td>
+                    <td id="COP11"></td>
+                </tr>
+                <tr>
+                    <td>12</td>
+                    <td>169</td>
+                    <td id="need12"></td>
+                    <td id="energy12"></td>
+                    <td id="load_ratio12"></td><!--负荷率-->
+                    <td id="load12"></td><!--负荷-->
+                    <td id="elbu12"></td><!--电辅容量-->
+                    <td id="heat12"></td>
+                    <td id="COP12"></td>
+                </tr>
+                <tr>
+                    <td>13</td>
+                    <td>151</td>
+                    <td id="need13"></td>
+                    <td id="energy13"></td>
+                    <td id="load_ratio13"></td><!--负荷率-->
+                    <td id="load13"></td><!--负荷-->
+                    <td id="elbu13"></td><!--电辅容量-->
+                    <td id="heat13"></td>
+                    <td id="COP13"></td>
+                </tr>
+                <tr>
+                    <td>14</td>
+                    <td>105</td>
+                    <td id="need14"></td>
+                    <td id="energy14"></td>
+                    <td id="load_ratio14"></td><!--负荷率-->
+                    <td id="load14"></td><!--负荷-->
+                    <td id="elbu14"></td><!--电辅容量-->
+                    <td id="heat14"></td>
+                    <td id="COP14"></td>
+                </tr>
+                <tr>
+                    <td>15</td>
+                    <td>74</td>
+                    <td id="need15"></td>
+                    <td id="energy15"></td>
+                    <td id="load_ratio15"></td><!--负荷率-->
+                    <td id="load15"></td><!--负荷-->
+                    <td id="elbu15"></td><!--电辅容量-->
+                    <td id="heat15"></td>
+                    <td id="COP15"></td>
+                </tr>
+
+
+            </tbody>
+            <colgroup>
+                <col>
+                <col>
+                <col>
+            </colgroup>
+        </table>
+
+        <!-- 三角形
+    <div class="container">
+        <div class="triangle triangle-down"></div>
+        <div class="triangle triangle-up"></div>
+    </div>-->
+
+        <script>
+            //0代表负号
+            document.getElementById('save');//获取按钮
+            const calculate = document.getElementById('calculate');//获取按钮
+            calculate.addEventListener('click', function () {
+
+                //获取用户输入制热量数据，并转为数字类型
+                const heatA = Number(document.getElementById("heatA").value);
+                const heatB = Number(document.getElementById("heatB").value);
+                const heatC = Number(document.getElementById("heatC").value);
+                const heatD = Number(document.getElementById("heatD").value);
+                const heatE = Number(document.getElementById("heatE").value);
+                document.getElementById("heatF").innerHTML = heatA;
+
+                //获取用户输入COP数据，并转为数字类型
+                const COPA = Number(document.getElementById("COPA").value);
+                const COPB = Number(document.getElementById("COPB").value);
+                const COPC = Number(document.getElementById("COPC").value);
+                const COPD = Number(document.getElementById("COPD").value);
+                const COPE = Number(document.getElementById("COPE").value);
+                document.getElementById("COPF").innerHTML = COPA;
+
+                //获取用户输入Cd、Tbiv数据，并转为数字类型
+                const CdA = Number(document.getElementById("CdA").value);
+                const CdB = Number(document.getElementById("CdB").value);
+                const CdC = Number(document.getElementById("CdC").value);
+                const CdD = Number(document.getElementById("CdD").value);
+                const CdE = Number(document.getElementById("CdE").value);
+
+                const Tbiv = Number(document.getElementById("Tbiv").value);
+                document.getElementById("CdF").innerHTML = CdA;
+
+                //window.alert(CdA);
+
+                //获取待机模式等功率数据，并转为数字类型
+                const PTO = Number(document.getElementById("PTO").value);
+                const PSB = Number(document.getElementById("PSB").value);
+                const PCK = Number(document.getElementById("PCK").value);
+                const POFF = Number(document.getElementById("POFF").value);
+
+                //读取表格环温
+
+                const Tj15 = 15, Tj14 = 14, Tj13 = 13, Tj12 = 12, Tj11 = 11,
+                    Tj10 = 10, Tj9 = 9, Tj8 = 8, Tj7 = 7, Tj6 = 6,
+                    Tj5 = 5, Tj4 = 4, Tj3 = 3, Tj2 = 2, Tj1 = 1,
+                    Tj0 = 0,
+                    Tj01 = -1, Tj02 = -2, Tj03 = -3, Tj04 = -4, Tj05 = -5,
+                    Tj06 = -6, Tj07 = -7, Tj08 = -8, Tj09 = -9, Tj010 = -10;
+
+                const hjA15 = 74, hjA14 = 105, hjA13 = 151, hjA12 = 169, hjA11 = 215,
+                    hjA10 = 315, hjA9 = 335, hjA8 = 348, hjA7 = 326, hjA6 = 330,
+                    hjA5 = 303, hjA4 = 356, hjA3 = 357, hjA2 = 320, hjA1 = 280,
+                    hjA0 = 240,
+                    hjA01 = 173, hjA02 = 165, hjA03 = 89, hjA04 = 91, hjA05 = 68,
+                    hjA06 = 27, hjA07 = 24, hjA08 = 23, hjA09 = 25, hjA010 = 1;
+
+
+                //负荷率
+                const Tdesignh = -10;  //根据气候定
+
+                let load_ratio010 = (Tj010 - 16) / (Tdesignh - 16) * 100,
+                    load_ratio09 = (Tj09 - 16) / (Tdesignh - 16) * 100,
+                    load_ratio08 = (Tj08 - 16) / (Tdesignh - 16) * 100,
+                    load_ratio07 = (Tj07 - 16) / (Tdesignh - 16) * 100,
+                    load_ratio06 = (Tj06 - 16) / (Tdesignh - 16) * 100,
+                    load_ratio05 = (Tj05 - 16) / (Tdesignh - 16) * 100,
+                    load_ratio04 = (Tj04 - 16) / (Tdesignh - 16) * 100,
+                    load_ratio03 = (Tj03 - 16) / (Tdesignh - 16) * 100,
+                    load_ratio02 = (Tj02 - 16) / (Tdesignh - 16) * 100,
+                    load_ratio01 = (Tj01 - 16) / (Tdesignh - 16) * 100,
+                    load_ratio0 = (Tj0 - 16) / (Tdesignh - 16) * 100,
+                    load_ratio1 = (Tj1 - 16) / (Tdesignh - 16) * 100,
+                    load_ratio2 = (Tj2 - 16) / (Tdesignh - 16) * 100,
+                    load_ratio3 = (Tj3 - 16) / (Tdesignh - 16) * 100,
+                    load_ratio4 = (Tj4 - 16) / (Tdesignh - 16) * 100,
+                    load_ratio5 = (Tj5 - 16) / (Tdesignh - 16) * 100,
+                    load_ratio6 = (Tj6 - 16) / (Tdesignh - 16) * 100,
+                    load_ratio7 = (Tj7 - 16) / (Tdesignh - 16) * 100,
+                    load_ratio8 = (Tj8 - 16) / (Tdesignh - 16) * 100,
+                    load_ratio9 = (Tj9 - 16) / (Tdesignh - 16) * 100,
+                    load_ratio10 = (Tj10 - 16) / (Tdesignh - 16) * 100,
+                    load_ratio11 = (Tj11 - 16) / (Tdesignh - 16) * 100,
+                    load_ratio12 = (Tj12 - 16) / (Tdesignh - 16) * 100,
+                    load_ratio13 = (Tj13 - 16) / (Tdesignh - 16) * 100,
+                    load_ratio14 = (Tj14 - 16) / (Tdesignh - 16) * 100,
+                    load_ratio15 = (Tj15 - 16) / (Tdesignh - 16) * 100;
+
+                //const Pdesignh=Number(document.getElementById("Pdesignh").value); //用户输入值
+                let Pdesignh = heatA / load_ratio07 * 100;  //根据A工况计算值
+
+                //负荷
+                let load010 = Pdesignh * load_ratio010 / 100,
+                    load09 = Pdesignh * load_ratio09 / 100,
+                    load08 = Pdesignh * load_ratio08 / 100,
+                    load07 = Pdesignh * load_ratio07 / 100,
+                    load06 = Pdesignh * load_ratio06 / 100,
+                    load05 = Pdesignh * load_ratio05 / 100,
+                    load04 = Pdesignh * load_ratio04 / 100,
+                    load03 = Pdesignh * load_ratio03 / 100,
+                    load02 = Pdesignh * load_ratio02 / 100,
+                    load01 = Pdesignh * load_ratio01 / 100,
+                    load0 = Pdesignh * load_ratio0 / 100,
+                    load1 = Pdesignh * load_ratio1 / 100,
+                    load2 = Pdesignh * load_ratio2 / 100,
+                    load3 = Pdesignh * load_ratio3 / 100,
+                    load4 = Pdesignh * load_ratio4 / 100,
+                    load5 = Pdesignh * load_ratio5 / 100,
+                    load6 = Pdesignh * load_ratio6 / 100,
+                    load7 = Pdesignh * load_ratio7 / 100,
+                    load8 = Pdesignh * load_ratio8 / 100,
+                    load9 = Pdesignh * load_ratio9 / 100,
+                    load10 = Pdesignh * load_ratio10 / 100,
+                    load11 = Pdesignh * load_ratio11 / 100,
+                    load12 = Pdesignh * load_ratio12 / 100,
+                    load13 = Pdesignh * load_ratio13 / 100,
+                    load14 = Pdesignh * load_ratio14 / 100,
+                    load15 = Pdesignh * load_ratio15 / 100;
+
+                //年供暖需求
+                let need010 = hjA010 * load010,
+                    need09 = hjA09 * load09,
+                    need08 = hjA08 * load08,
+                    need07 = hjA07 * load07,
+                    need06 = hjA06 * load06,
+                    need05 = hjA05 * load05,
+                    need04 = hjA04 * load04,
+                    need03 = hjA03 * load03,
+                    need02 = hjA02 * load02,
+                    need01 = hjA01 * load01,
+                    need0 = hjA0 * load0,
+                    need1 = hjA1 * load1,
+                    need2 = hjA2 * load2,
+                    need3 = hjA3 * load3,
+                    need4 = hjA4 * load4,
+                    need5 = hjA5 * load5,
+                    need6 = hjA6 * load6,
+                    need7 = hjA7 * load7,
+                    need8 = hjA8 * load8,
+                    need9 = hjA9 * load9,
+                    need10 = hjA10 * load10,
+                    need11 = hjA11 * load11,
+                    need12 = hjA12 * load12,
+                    need13 = hjA13 * load13,
+                    need14 = hjA14 * load14,
+                    need15 = hjA15 * load15;
+
+
+
+                //制热量
+                let heat010 = heatE,
+                    heat07 = heatA,
+                    heat2 = heatB,
+                    heat7 = heatC,
+                    heat12 = heatD,
+
+                    heat09 = heat010 + (Tj09 - Tj010) / (Tj07 - Tj010) * (heat07 - heat010),
+                    heat08 = heat010 + (Tj08 - Tj010) / (Tj07 - Tj010) * (heat07 - heat010),
+
+                    heat06 = heat07 + (Tj06 - Tj07) / (Tj2 - Tj07) * (heat2 - heat07),
+                    heat05 = heat07 + (Tj05 - Tj07) / (Tj2 - Tj07) * (heat2 - heat07),
+                    heat04 = heat07 + (Tj04 - Tj07) / (Tj2 - Tj07) * (heat2 - heat07),
+                    heat03 = heat07 + (Tj03 - Tj07) / (Tj2 - Tj07) * (heat2 - heat07),
+                    heat02 = heat07 + (Tj02 - Tj07) / (Tj2 - Tj07) * (heat2 - heat07),
+                    heat01 = heat07 + (Tj01 - Tj07) / (Tj2 - Tj07) * (heat2 - heat07),
+                    heat0 = heat07 + (Tj0 - Tj07) / (Tj2 - Tj07) * (heat2 - heat07),
+                    heat1 = heat07 + (Tj1 - Tj07) / (Tj2 - Tj07) * (heat2 - heat07),
+
+                    heat3 = heat2 + (Tj3 - Tj2) / (Tj7 - Tj2) * (heat7 - heat2),
+                    heat4 = heat2 + (Tj4 - Tj2) / (Tj7 - Tj2) * (heat7 - heat2),
+                    heat5 = heat2 + (Tj5 - Tj2) / (Tj7 - Tj2) * (heat7 - heat2),
+                    heat6 = heat2 + (Tj6 - Tj2) / (Tj7 - Tj2) * (heat7 - heat2),
+
+                    heat8 = heat7 + (Tj8 - Tj7) / (Tj12 - Tj7) * (heat12 - heat7),
+                    heat9 = heat7 + (Tj9 - Tj7) / (Tj12 - Tj7) * (heat12 - heat7),
+                    heat10 = heat7 + (Tj10 - Tj7) / (Tj12 - Tj7) * (heat12 - heat7),
+                    heat11 = heat7 + (Tj11 - Tj7) / (Tj12 - Tj7) * (heat12 - heat7),
+
+                    heat13 = heat7 + (Tj13 - Tj7) / (Tj12 - Tj7) * (heat12 - heat7),
+                    heat14 = heat7 + (Tj14 - Tj7) / (Tj12 - Tj7) * (heat12 - heat7),
+                    heat15 = heat7 + (Tj15 - Tj7) / (Tj12 - Tj7) * (heat12 - heat7);
+
+                //COP修正
+                let COPdA = COPA,
+                    COPdB = COPB,
+                    COPdC = COPC,
+                    COPdD = COPD,
+                    COPdE = COPE,
+
+                    plTjA = load_ratio07,
+                    plTjB = load_ratio2,
+                    plTjC = load_ratio7,
+                    plTjD = load_ratio12,
+                    plTjE = load_ratio010,
+
+                    PdhA = heatA,
+                    PdhB = heatB,
+                    PdhC = heatC,
+                    PdhD = heatD,
+                    PdhE = heatE;
+
+                let CRA;
+                function CRa() {
+                    if (plTjA * Pdesignh / PdhA / 100 > 1) { CRA = 1; }
+                    else { CRA = plTjA * Pdesignh / PdhA / 100; }
+                }
+                CRa();
+                let CRB;
+                function CRb() {
+                    if (plTjB * Pdesignh / PdhB / 100 > 1) { CRB = 1; }
+                    else { CRB = plTjB * Pdesignh / PdhB / 100; }
+                }
+                CRb();
+                let CRC;
+                function CRc() {
+                    if (plTjC * Pdesignh / PdhC / 100 > 1) { CRC = 1; }
+                    else { CRC = plTjC * Pdesignh / PdhC / 100; }
+                }
+                CRc();
+                let CRD;
+                function CRd() {
+                    if (plTjD * Pdesignh / PdhD / 100 > 1) { CRD = 1; }
+                    else { CRD = plTjD * Pdesignh / PdhD / 100; }
+                }
+                CRd();
+                let CRE;
+                function CRe() {
+                    if (plTjE * Pdesignh / PdhE / 100 > 1) { CRE = 1; }
+                    else { CRE = plTjE * Pdesignh / PdhE / 100; }
+                }
+                CRe();
+
+
+                let COPbinTjA;
+                function COPbinTja() {
+                    if (load07 * 1.1 < heatA) { COPbinTjA = COPdA * (CRA / (CdA * CRA + (1 - CdA))); }
+                    else {
+                        if (heatA < load010 * 0.9) { COPbinTjA = COPdA * (CRA / (CdA * CRA + (1 - CdA))); }
+                        else { COPbinTjA = COPdA; }
+                    }
+                }
+                COPbinTja();
+                let COPbinTjB;
+                function COPbinTjb() {
+                    if (load07 * 1.1 < heatB) { COPbinTjB = COPdB * (CRB / (CdB * CRB + (1 - CdB))); }
+                    else {
+                        if (heatB < load010 * 0.9) { COPbinTjB = COPdB * (CRB / (CdB * CRB + (1 - CdB))); }
+                        else { COPbinTjB = COPdB; }
+                    }
+                }
+                COPbinTjb();
+                let COPbinTjC;
+                function COPbinTjc() {
+                    if (load07 * 1.1 < heatC) { COPbinTjC = COPdC * (CRC / (CdC * CRC + (1 - CdC))); }
+                    else {
+                        if (heatC < load010 * 0.9) { COPbinTjC = COPdC * (CRC / (CdC * CRC + (1 - CdC))); }
+                        else { COPbinTjC = COPdC; }
+                    }
+                }
+                COPbinTjc();
+                let COPbinTjD;
+                function COPbinTjd() {
+                    if (load07 * 1.1 < heatD) { COPbinTjD = COPdD * (CRD / (CdD * CRD + (1 - CdD))); }
+                    else {
+                        if (heatD < load010 * 0.9) { COPbinTjD = COPdD * (CRD / (CdD * CRD + (1 - CdD))); }
+                        else { COPbinTjD = COPdD; }
+                    }
+                }
+                COPbinTjd();
+
+                let COPbinTjE;
+                function COPbinTje() {
+                    if (Tbiv < -10) { COPbinTjE = COPdE; }
+                    else {
+                        if (load010 * 1.1 < heatE) { COPbinTjE = COPdE * (CRE / (CdE * CRE + (1 - CdE))); }
+                        else {
+                            if (heatE < load010 * 0.9) { COPbinTjE = COPdE * (CRE / (CdE * CRE + (1 - CdE))); }
+                            else { COPbinTjE = COPdE; }
+                        }
+                    }
+                }
+                COPbinTje();
+
+                //能效
+                let COP010 = COPbinTjE,
+                    COP07 = COPbinTjA,
+                    COP2 = COPbinTjB,
+                    COP7 = COPbinTjC,
+                    COP12 = COPbinTjD,
+
+                    COP09 = COP010 + (Tj09 - Tj010) / (Tj07 - Tj010) * (COP07 - COP010),
+                    COP08 = COP010 + (Tj08 - Tj010) / (Tj07 - Tj010) * (COP07 - COP010),
+
+                    COP06 = COP07 + (Tj06 - Tj07) / (Tj2 - Tj07) * (COP2 - COP07),
+                    COP05 = COP07 + (Tj05 - Tj07) / (Tj2 - Tj07) * (COP2 - COP07),
+                    COP04 = COP07 + (Tj04 - Tj07) / (Tj2 - Tj07) * (COP2 - COP07),
+                    COP03 = COP07 + (Tj03 - Tj07) / (Tj2 - Tj07) * (COP2 - COP07),
+                    COP02 = COP07 + (Tj02 - Tj07) / (Tj2 - Tj07) * (COP2 - COP07),
+                    COP01 = COP07 + (Tj01 - Tj07) / (Tj2 - Tj07) * (COP2 - COP07),
+                    COP0 = COP07 + (Tj0 - Tj07) / (Tj2 - Tj07) * (COP2 - COP07),
+                    COP1 = COP07 + (Tj1 - Tj07) / (Tj2 - Tj07) * (COP2 - COP07),
+
+                    COP3 = COP2 + (Tj3 - Tj2) / (Tj7 - Tj2) * (COP7 - COP2),
+                    COP4 = COP2 + (Tj4 - Tj2) / (Tj7 - Tj2) * (COP7 - COP2),
+                    COP5 = COP2 + (Tj5 - Tj2) / (Tj7 - Tj2) * (COP7 - COP2),
+                    COP6 = COP2 + (Tj6 - Tj2) / (Tj7 - Tj2) * (COP7 - COP2),
+
+                    COP8 = COP7 + (Tj8 - Tj7) / (Tj12 - Tj7) * (COP12 - COP7),
+                    COP9 = COP7 + (Tj9 - Tj7) / (Tj12 - Tj7) * (COP12 - COP7),
+                    COP10 = COP7 + (Tj10 - Tj7) / (Tj12 - Tj7) * (COP12 - COP7),
+                    COP11 = COP7 + (Tj11 - Tj7) / (Tj12 - Tj7) * (COP12 - COP7),
+
+                    COP13 = COP7 + (Tj13 - Tj7) / (Tj12 - Tj7) * (COP12 - COP7),
+                    COP14 = COP7 + (Tj14 - Tj7) / (Tj12 - Tj7) * (COP12 - COP7),
+                    COP15 = COP7 + (Tj15 - Tj7) / (Tj12 - Tj7) * (COP12 - COP7);
+
+                //电辅容量
+                let elbu010;  //写在函数内就是局部变量
+                function e010() {
+                    if (load010 > heat010) { elbu010 = load010 - heat010; }
+                    else { elbu010 = 0; }
+                }
+                e010();  //调用函数，e010为函数名
+                let elbu09;
+                function e09() {
+                    if (load09 > heat09) { elbu09 = load09 - heat09; }
+                    else { elbu09 = 0; }
+                }
+                e09();  //调用函数，e09为函数名
+                let elbu08;
+                function e08() {
+                    if (load08 > heat08) { elbu08 = load08 - heat08; }
+                    else { elbu08 = 0; }
+                }
+                e08();  //调用函数，e08为函数名
+                let elbu07;
+                function e07() {
+                    if (load07 > heat07) { elbu07 = load07 - heat07; }
+                    else { elbu07 = 0; }
+                }
+                e07();
+                let elbu06;
+                function e06() {
+                    if (load06 > heat06) { elbu06 = load06 - heat06; }
+                    else { elbu06 = 0; }
+                }
+                e06();  //调用函数，e06为函数名
+                let elbu05;
+                function e05() {
+                    if (load05 > heat05) { elbu05 = load05 - heat05; }
+                    else { elbu05 = 0; }
+                }
+                e05();  //调用函数，e05为函数名
+                let elbu04;
+                function e04() {
+                    if (load04 > heat04) { elbu04 = load04 - heat04; }
+                    else { elbu04 = 0; }
+                }
+                e04();  //调用函数，e04为函数名
+                let elbu03;
+                function e03() {
+                    if (load03 > heat03) { elbu03 = load03 - heat03; }
+                    else { elbu03 = 0; }
+                }
+                e03();  //调用函数，e03为函数名
+                let elbu02;
+                function e02() {
+                    if (load02 > heat02) { elbu02 = load02 - heat02; }
+                    else { elbu02 = 0; }
+                }
+                e02();  //调用函数，e02为函数名
+                let elbu01;
+                function e01() {
+                    if (load01 > heat01) { elbu01 = load01 - heat01; }
+                    else { elbu01 = 0; }
+                }
+                e01();  //调用函数，e01为函数名
+                let elbu0;
+                function e0() {
+                    if (load0 > heat0) { elbu0 = load0 - heat0; }
+                    else { elbu0 = 0; }
+                }
+                e0();  //调用函数，e0为函数名
+                let elbu1;
+                function e1() {
+                    if (load1 > heat1) { elbu1 = load1 - heat1; }
+                    else { elbu1 = 0; }
+                }
+                e1();  //调用函数，e1为函数名
+                let elbu2;
+                function e2() {
+                    if (load2 > heat2) { elbu2 = load2 - heat2; }
+                    else { elbu2 = 0; }
+                }
+                e2();
+                let elbu3;
+                function e3() {
+                    if (load3 > heat3) { elbu3 = load3 - heat3; }
+                    else { elbu3 = 0; }
+                }
+                e3();  //调用函数，e3为函数名
+                let elbu4;
+                function e4() {
+                    if (load4 > heat4) { elbu4 = load4 - heat4; }
+                    else { elbu4 = 0; }
+                }
+                e4();  //调用函数，e4为函数名
+                let elbu5;
+                function e5() {
+                    if (load5 > heat5) { elbu5 = load5 - heat5; }
+                    else { elbu5 = 0; }
+                }
+                e5();  //调用函数，e5为函数名
+                let elbu6;
+                function e6() {
+                    if (load6 > heat6) { elbu6 = load6 - heat6; }
+                    else { elbu6 = 0; }
+                }
+                e6();  //调用函数，e6为函数名
+                let elbu7;
+                function e7() {
+                    if (load7 > heat7) { elbu7 = load7 - heat7; }
+                    else { elbu7 = 0; }
+                }
+                e7();
+                let elbu8;
+                function e8() {
+                    if (load8 > heat8) { elbu8 = load8 - heat8; }
+                    else { elbu8 = 0; }
+                }
+                e8();  //调用函数，e8为函数名
+                let elbu9;
+                function e9() {
+                    if (load9 > heat9) { elbu9 = load9 - heat9; }
+                    else { elbu9 = 0; }
+                }
+                e9();  //调用函数，e9为函数名
+                let elbu10;
+                function e10() {
+                    if (load10 > heat10) { elbu10 = load10 - heat10; }
+                    else { elbu10 = 0; }
+                }
+                e10();  //调用函数，e10为函数名
+                let elbu11;
+                function e11() {
+                    if (load11 > heat11) { elbu11 = load11 - heat11; }
+                    else { elbu11 = 0; }
+                }
+                e11();  //调用函数，e11为函数名
+                let elbu12;
+                function e12() {
+                    if (load12 > heat12) { elbu12 = load12 - heat12; }
+                    else { elbu12 = 0; }
+                }
+                e12();
+                let elbu13;
+                function e13() {
+                    if (load13 > heat13) { elbu13 = load13 - heat13; }
+                    else { elbu13 = 0; }
+                }
+                e13();
+                let elbu14;
+                function e14() {
+                    if (load14 > heat14) { elbu14 = load14 - heat14; }
+                    else { elbu14 = 0; }
+                }
+                e14();
+                let elbu15;
+                function e15() {
+                    if (load15 > heat15) { elbu15 = load15 - heat15; }
+                    else { elbu15 = 0; }
+                }
+                e15();
+
+                //年能量输入
+                let energy010 = hjA010 * ((load010 - elbu010) / COP010 + elbu010),
+                    energy09 = hjA09 * ((load09 - elbu09) / COP09 + elbu09),
+                    energy08 = hjA08 * ((load08 - elbu08) / COP08 + elbu08),
+                    energy07 = hjA07 * ((load07 - elbu07) / COP07 + elbu07),
+                    energy06 = hjA06 * ((load06 - elbu06) / COP06 + elbu06),
+                    energy05 = hjA05 * ((load05 - elbu05) / COP05 + elbu05),
+                    energy04 = hjA04 * ((load04 - elbu04) / COP04 + elbu04),
+                    energy03 = hjA03 * ((load03 - elbu03) / COP03 + elbu03),
+                    energy02 = hjA02 * ((load02 - elbu02) / COP02 + elbu02),
+                    energy01 = hjA01 * ((load01 - elbu01) / COP01 + elbu01),
+                    energy0 = hjA0 * ((load0 - elbu0) / COP0 + elbu0),
+                    energy1 = hjA1 * ((load1 - elbu1) / COP1 + elbu1),
+                    energy2 = hjA2 * ((load2 - elbu2) / COP2 + elbu2),
+                    energy3 = hjA3 * ((load3 - elbu3) / COP3 + elbu3),
+                    energy4 = hjA4 * ((load4 - elbu4) / COP4 + elbu4),
+                    energy5 = hjA5 * ((load5 - elbu5) / COP5 + elbu5),
+                    energy6 = hjA6 * ((load6 - elbu6) / COP6 + elbu6),
+                    energy7 = hjA7 * ((load7 - elbu7) / COP7 + elbu7),
+                    energy8 = hjA8 * ((load8 - elbu8) / COP8 + elbu8),
+                    energy9 = hjA9 * ((load9 - elbu9) / COP9 + elbu9),
+                    energy10 = hjA10 * ((load10 - elbu10) / COP10 + elbu10),
+                    energy11 = hjA11 * ((load11 - elbu11) / COP11 + elbu11),
+                    energy12 = hjA12 * ((load12 - elbu12) / COP12 + elbu12),
+                    energy13 = hjA13 * ((load13 - elbu13) / COP13 + elbu13),
+                    energy14 = hjA14 * ((load14 - elbu14) / COP14 + elbu14),
+                    energy15 = hjA15 * ((load15 - elbu15) / COP15 + elbu15);
+
+                //实际负荷率
+                let loadA = heat07 / Pdesignh * 100,
+                    loadB = heat2 / Pdesignh * 100,
+                    loadC = heat7 / Pdesignh * 100,
+                    loadD = heat12 / Pdesignh * 100,
+                    loadE = heat010 / Pdesignh * 100;
+
+                //SCOPon计算
+                let need = need010 + need09 + need08 + need07 + need06 + need05 + need04 + need03 + need02 + need01 + need0 + need1 + need2 + need3 + need4 + need5 + need6 + need7 + need8 + need9 + need10 + need11 + need12 + need13 + need14 + need15;
+                let energy = energy010 + energy09 + energy08 + energy07 + energy06 + energy05 + energy04 + energy03 + energy02 + energy01 + energy0 + energy1 + energy2 + energy3 + energy4 + energy5 + energy6 + energy7 + energy8 + energy9 + energy10 + energy11 + energy12 + energy13 + energy14 + energy15;
+                let SCOPon = need / energy;
+
+                //SCOPnet计算
+                let netb010 = hjA010 * (load010 - elbu010),
+                    netb09 = hjA09 * (load09 - elbu09),
+                    netb08 = hjA08 * (load08 - elbu08),
+                    netb07 = hjA07 * (load07 - elbu07),
+                    netb06 = hjA06 * (load06 - elbu06),
+                    netb05 = hjA05 * (load05 - elbu05),
+                    netb04 = hjA04 * (load04 - elbu04),
+                    netb03 = hjA03 * (load03 - elbu03),
+                    netb02 = hjA02 * (load02 - elbu02),
+                    netb01 = hjA01 * (load01 - elbu01),
+                    netb0 = hjA0 * (load0 - elbu0),
+                    netb1 = hjA1 * (load1 - elbu1),
+                    netb2 = hjA2 * (load2 - elbu2),
+                    netb3 = hjA3 * (load3 - elbu3),
+                    netb4 = hjA4 * (load4 - elbu4),
+                    netb5 = hjA5 * (load5 - elbu5),
+                    netb6 = hjA6 * (load6 - elbu6),
+                    netb7 = hjA7 * (load7 - elbu7),
+                    netb8 = hjA8 * (load8 - elbu8),
+                    netb9 = hjA9 * (load9 - elbu9),
+                    netb10 = hjA10 * (load10 - elbu10),
+                    netb11 = hjA11 * (load11 - elbu11),
+                    netb12 = hjA12 * (load12 - elbu12),
+                    netb13 = hjA13 * (load13 - elbu13),
+                    netb14 = hjA14 * (load14 - elbu14),
+                    netb15 = hjA15 * (load15 - elbu15);
+
+                let neta010 = hjA010 * ((load010 - elbu010) / COP010),
+                    neta09 = hjA09 * ((load09 - elbu09) / COP09),
+                    neta08 = hjA08 * ((load08 - elbu08) / COP08),
+                    neta07 = hjA07 * ((load07 - elbu07) / COP07),
+                    neta06 = hjA06 * ((load06 - elbu06) / COP06),
+                    neta05 = hjA05 * ((load05 - elbu05) / COP05),
+                    neta04 = hjA04 * ((load04 - elbu04) / COP04),
+                    neta03 = hjA03 * ((load03 - elbu03) / COP03),
+                    neta02 = hjA02 * ((load02 - elbu02) / COP02),
+                    neta01 = hjA01 * ((load01 - elbu01) / COP01),
+                    neta0 = hjA0 * ((load0 - elbu0) / COP0),
+                    neta1 = hjA1 * ((load1 - elbu1) / COP1),
+                    neta2 = hjA2 * ((load2 - elbu2) / COP2),
+                    neta3 = hjA3 * ((load3 - elbu3) / COP3),
+                    neta4 = hjA4 * ((load4 - elbu4) / COP4),
+                    neta5 = hjA5 * ((load5 - elbu5) / COP5),
+                    neta6 = hjA6 * ((load6 - elbu6) / COP6),
+                    neta7 = hjA7 * ((load7 - elbu7) / COP7),
+                    neta8 = hjA8 * ((load8 - elbu8) / COP8),
+                    neta9 = hjA9 * ((load9 - elbu9) / COP9),
+                    neta10 = hjA10 * ((load10 - elbu10) / COP10),
+                    neta11 = hjA11 * ((load11 - elbu11) / COP11),
+                    neta12 = hjA12 * ((load12 - elbu12) / COP12),
+                    neta13 = hjA13 * ((load13 - elbu13) / COP13),
+                    neta14 = hjA14 * ((load14 - elbu14) / COP14),
+                    neta15 = hjA15 * ((load15 - elbu15) / COP15);
+
+                let netb = netb010 + netb09 + netb08 + netb07 + netb06 + netb05 + netb04 + netb03 + netb02 + netb01 + netb0 + netb1 + netb2 + netb3 + netb4 + netb5 + netb6 + netb7 + netb8 + netb9 + netb10 + netb11 + netb12 + netb13 + netb14 + netb15;
+                let neta = neta010 + neta09 + neta08 + neta07 + neta06 + neta05 + neta04 + neta03 + neta02 + neta01 + neta0 + neta1 + neta2 + neta3 + neta4 + neta5 + neta6 + neta7 + neta8 + neta9 + neta10 + neta11 + neta12 + neta13 + neta14 + neta15;
+                let SCOPnet = netb / neta;
+
+                //QH计算
+                //let Pdesignh = 6.6 ;
+                let HHE = 2066;
+                let QH = Pdesignh * HHE;
+
+                //QHE计算
+                let HTO = 178;
+                let HSB = 0;
+                let HCK = 178;
+                let HOFF = 0;
+                let QHE = QH / SCOPon + HTO * PTO / 1000 + HSB * PSB / 1000 + HCK * PCK / 1000 + HOFF * POFF / 1000;
+
+                //SCOP计算
+                let SCOP = QH / QHE;
+
+                //效率计算
+                let η = (SCOP / 2.5 - 0.03) * 100;
+
+                //等级计算
+
+                let level1;
+                function level35() {
+                    if (η >= 175) { level1 = "A+++"; }
+                    else {
+                        if (η >= 150) { level1 = "A++"; }
+                        else {
+                            if (η >= 123) { level1 = "A+"; }
+                            else {
+                                if (η >= 115) { level1 = "A"; }
+                                else {
+                                    if (η >= 107) { level1 = "B"; }
+                                    else {
+                                        if (η >= 100) { level1 = "C"; }
+                                        else {
+                                            level1 = "能效偏低"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                level35();
+
+                let level2;
+                function level55() {
+                    if (η >= 150) { level2 = "A+++"; }
+                    else {
+                        if (η >= 125) { level2 = "A++"; }
+                        else {
+                            if (η >= 98) { level2 = "A+"; }
+                            else {
+                                if (η >= 90) { level2 = "A"; }
+                                else {
+                                    if (η >= 82) { level2 = "B"; }
+                                    else {
+                                        if (η >= 75) { level2 = "C"; }
+                                        else {
+                                            level2 = "能效偏低"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                level55();
+                
+                //ture = 55;false=35
+                const sel = document.getElementById("sel").checked;
+               // alert(sel);
+                let level;
+                function lv() {
+                    if (sel == false) { level = level1; }
+                    else { level = level2; }
+                }
+                lv();
+
+                //计算进度条最值
+                let metermin;//先做55° //option2 是35℃，level1是35℃
+                let metermax;
+                let Aup;
+                let Adown;
+                function meterMin() {
+                    if (sel == true && level === "A+++") { metermin = 3.83; metermax = 5.74; Aup = "A+++"; Adown = "high"; }
+                    else {
+                        if (sel == true && level === "A++") { metermin = 3.20; metermax = 3.83; Aup = "A++"; Adown = "A+++"; }
+                        else {
+                            if (sel == true && level === "A+") { metermin = 2.53; metermax = 3.20; Aup = "A+"; Adown = "A++"; }
+                            else {
+                                if (sel == true && level === "A") { metermin = 2.33; metermax = 2.53; Aup = "A"; Adown = "A+"; }
+                                else {
+                                    if (sel == false && level === "A+++") { metermin = 4.45; metermax = 6.68; Aup = "A+++"; Adown = "high"; }
+                                    else {
+                                        if (sel == false && level === "A++") { metermin = 3.83; metermax = 4.45; Aup = "A++"; Adown = "A+++"; }
+                                        else {
+                                            if (sel == false && level === "A+") { metermin = 3.15; metermax = 3.83; Aup = "A+"; Adown = "A++"; }
+                                            else {
+                                                if (sel == false && level === "A") { metermin = 2.95; metermax = 3.15; Aup = "A"; Adown = "A+"; }
+                                                else {
+                                                    metermin = 0; metermax = 2.95; Aup = "Low"; Adown = "Low";
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                meterMin();
+                const meter1Element = document.getElementById('meter1');
+                meter1Element.min = metermin;
+                meter1Element.max = metermax;
+                // window.alert(metermin);
+                //   window.alert(metermax);
+
+                //写入到进度条（最值）
+                document.getElementById("Aupn").innerHTML = metermin;
+                document.getElementById("Adownn").innerHTML = metermax;
+                document.getElementById("Aup").innerHTML = Aup;
+                document.getElementById("Adown").innerHTML = Adown;
+
+                //写入到表格（年供暖需求）
+                need010 = need010.toFixed(0);
+                need09 = need09.toFixed(0);
+                need08 = need08.toFixed(0);
+                need07 = need07.toFixed(0);
+                need06 = need06.toFixed(0);
+                need05 = need05.toFixed(0);
+                need04 = need04.toFixed(0);
+                need03 = need03.toFixed(0);
+                need02 = need02.toFixed(0);
+                need01 = need01.toFixed(0);
+                need0 = need0.toFixed(0);
+                need1 = need1.toFixed(0);
+                need2 = need2.toFixed(0);
+                need3 = need3.toFixed(0);
+                need4 = need4.toFixed(0);
+                need5 = need5.toFixed(0);
+                need6 = need6.toFixed(0);
+                need7 = need7.toFixed(0);
+                need8 = need8.toFixed(0);
+                need9 = need9.toFixed(0);
+                need10 = need10.toFixed(0);
+                need11 = need11.toFixed(0);
+                need12 = need12.toFixed(0);
+                need13 = need13.toFixed(0);
+                need14 = need14.toFixed(0);
+                need15 = need15.toFixed(0);
+                document.getElementById("need010").innerHTML = need010;
+                document.getElementById("need09").innerHTML = need09;
+                document.getElementById("need08").innerHTML = need08;
+                document.getElementById("need07").innerHTML = need07;
+                document.getElementById("need06").innerHTML = need06;
+                document.getElementById("need05").innerHTML = need05;
+                document.getElementById("need04").innerHTML = need04;
+                document.getElementById("need03").innerHTML = need03;
+                document.getElementById("need02").innerHTML = need02;
+                document.getElementById("need01").innerHTML = need01;
+                document.getElementById("need0").innerHTML = need0;
+                document.getElementById("need1").innerHTML = need1;
+                document.getElementById("need2").innerHTML = need2;
+                document.getElementById("need3").innerHTML = need3;
+                document.getElementById("need4").innerHTML = need4;
+                document.getElementById("need5").innerHTML = need5;
+                document.getElementById("need6").innerHTML = need6;
+                document.getElementById("need7").innerHTML = need7;
+                document.getElementById("need8").innerHTML = need8;
+                document.getElementById("need9").innerHTML = need9;
+                document.getElementById("need10").innerHTML = need10;
+                document.getElementById("need11").innerHTML = need11;
+                document.getElementById("need12").innerHTML = need12;
+                document.getElementById("need13").innerHTML = need13;
+                document.getElementById("need14").innerHTML = need14;
+                document.getElementById("need15").innerHTML = need15;
+
+                
+
+                //写入到表格（年能量输入）
+                energy010 = energy010.toFixed(0);
+                energy09 = energy09.toFixed(0);
+                energy08 = energy08.toFixed(0);
+                energy07 = energy07.toFixed(0);
+                energy06 = energy06.toFixed(0);
+                energy05 = energy05.toFixed(0);
+                energy04 = energy04.toFixed(0);
+                energy03 = energy03.toFixed(0);
+                energy02 = energy02.toFixed(0);
+                energy01 = energy01.toFixed(0);
+                energy0 = energy0.toFixed(0);
+                energy1 = energy1.toFixed(0);
+                energy2 = energy2.toFixed(0);
+                energy3 = energy3.toFixed(0);
+                energy4 = energy4.toFixed(0);
+                energy5 = energy5.toFixed(0);
+                energy6 = energy6.toFixed(0);
+                energy7 = energy7.toFixed(0);
+                energy8 = energy8.toFixed(0);
+                energy9 = energy9.toFixed(0);
+                energy10 = energy10.toFixed(0);
+                energy11 = energy11.toFixed(0);
+                energy12 = energy12.toFixed(0);
+                energy13 = energy13.toFixed(0);
+                energy14 = energy14.toFixed(0);
+                energy15 = energy15.toFixed(0);
+                document.getElementById("energy010").innerHTML = energy010;
+                document.getElementById("energy09").innerHTML = energy09;
+                document.getElementById("energy08").innerHTML = energy08;
+                document.getElementById("energy07").innerHTML = energy07;
+                document.getElementById("energy06").innerHTML = energy06;
+                document.getElementById("energy05").innerHTML = energy05;
+                document.getElementById("energy04").innerHTML = energy04;
+                document.getElementById("energy03").innerHTML = energy03;
+                document.getElementById("energy02").innerHTML = energy02;
+                document.getElementById("energy01").innerHTML = energy01;
+                document.getElementById("energy0").innerHTML = energy0;
+                document.getElementById("energy1").innerHTML = energy1;
+                document.getElementById("energy2").innerHTML = energy2;
+                document.getElementById("energy3").innerHTML = energy3;
+                document.getElementById("energy4").innerHTML = energy4;
+                document.getElementById("energy5").innerHTML = energy5;
+                document.getElementById("energy6").innerHTML = energy6;
+                document.getElementById("energy7").innerHTML = energy7;
+                document.getElementById("energy8").innerHTML = energy8;
+                document.getElementById("energy9").innerHTML = energy9;
+                document.getElementById("energy10").innerHTML = energy10;
+                document.getElementById("energy11").innerHTML = energy11;
+                document.getElementById("energy12").innerHTML = energy12;
+                document.getElementById("energy13").innerHTML = energy13;
+                document.getElementById("energy14").innerHTML = energy14;
+                document.getElementById("energy15").innerHTML = energy15;
+
+                //写入到表格（电辅容量）
+                elbu010 = elbu010.toFixed(2);
+                elbu09 = elbu09.toFixed(2);
+                elbu08 = elbu08.toFixed(2);
+                elbu07 = elbu07.toFixed(2);
+                elbu06 = elbu06.toFixed(2);
+                elbu05 = elbu05.toFixed(2);
+                elbu04 = elbu04.toFixed(2);
+                elbu03 = elbu03.toFixed(2);
+                elbu02 = elbu02.toFixed(2);
+                elbu01 = elbu01.toFixed(2);
+                elbu0 = elbu0.toFixed(2);
+                elbu1 = elbu1.toFixed(2);
+                elbu2 = elbu2.toFixed(2);
+                elbu3 = elbu3.toFixed(2);
+                elbu4 = elbu4.toFixed(2);
+                elbu5 = elbu5.toFixed(2);
+                elbu6 = elbu6.toFixed(2);
+                elbu7 = elbu7.toFixed(2);
+                elbu8 = elbu8.toFixed(2);
+                elbu9 = elbu9.toFixed(2);
+                elbu10 = elbu10.toFixed(2);
+                elbu11 = elbu11.toFixed(2);
+                elbu12 = elbu12.toFixed(2);
+                elbu13 = elbu13.toFixed(2);
+                elbu14 = elbu14.toFixed(2);
+                elbu15 = elbu15.toFixed(2);
+                document.getElementById("elbu010").innerHTML = elbu010;
+                document.getElementById("elbu09").innerHTML = elbu09;
+                document.getElementById("elbu08").innerHTML = elbu08;
+                document.getElementById("elbu07").innerHTML = elbu07;
+                document.getElementById("elbu06").innerHTML = elbu06;
+                document.getElementById("elbu05").innerHTML = elbu05;
+                document.getElementById("elbu04").innerHTML = elbu04;
+                document.getElementById("elbu03").innerHTML = elbu03;
+                document.getElementById("elbu02").innerHTML = elbu02;
+                document.getElementById("elbu01").innerHTML = elbu01;
+                document.getElementById("elbu0").innerHTML = elbu0;
+                document.getElementById("elbu1").innerHTML = elbu1;
+                document.getElementById("elbu2").innerHTML = elbu2;
+                document.getElementById("elbu3").innerHTML = elbu3;
+                document.getElementById("elbu4").innerHTML = elbu4;
+                document.getElementById("elbu5").innerHTML = elbu5;
+                document.getElementById("elbu6").innerHTML = elbu6;
+                document.getElementById("elbu7").innerHTML = elbu7;
+                document.getElementById("elbu8").innerHTML = elbu8;
+                document.getElementById("elbu9").innerHTML = elbu9;
+                document.getElementById("elbu10").innerHTML = elbu10;
+                document.getElementById("elbu11").innerHTML = elbu11;
+                document.getElementById("elbu12").innerHTML = elbu12;
+                document.getElementById("elbu13").innerHTML = elbu13;
+                document.getElementById("elbu14").innerHTML = elbu14;
+                document.getElementById("elbu15").innerHTML = elbu15;
+
+
+                //写入到表格（负荷率）
+                load_ratio010 = load_ratio010.toFixed(2);
+                load_ratio09 = load_ratio09.toFixed(2);
+                load_ratio08 = load_ratio08.toFixed(2);
+                load_ratio07 = load_ratio07.toFixed(2);
+                load_ratio06 = load_ratio06.toFixed(2);
+                load_ratio05 = load_ratio05.toFixed(2);
+                load_ratio04 = load_ratio04.toFixed(2);
+                load_ratio03 = load_ratio03.toFixed(2);
+                load_ratio02 = load_ratio02.toFixed(2);
+                load_ratio01 = load_ratio01.toFixed(2);
+                load_ratio0 = load_ratio0.toFixed(2);
+                load_ratio1 = load_ratio1.toFixed(2);
+                load_ratio2 = load_ratio2.toFixed(2);
+                load_ratio3 = load_ratio3.toFixed(2);
+                load_ratio4 = load_ratio4.toFixed(2);
+                load_ratio5 = load_ratio5.toFixed(2);
+                load_ratio6 = load_ratio6.toFixed(2);
+                load_ratio7 = load_ratio7.toFixed(2);
+                load_ratio8 = load_ratio8.toFixed(2);
+                load_ratio9 = load_ratio9.toFixed(2);
+                load_ratio10 = load_ratio10.toFixed(2);
+                load_ratio11 = load_ratio11.toFixed(2);
+                load_ratio12 = load_ratio12.toFixed(2);
+                load_ratio13 = load_ratio13.toFixed(2);
+                load_ratio14 = load_ratio14.toFixed(2);
+                load_ratio15 = load_ratio15.toFixed(2);
+                document.getElementById("load_ratio010").innerHTML = load_ratio010;
+                document.getElementById("load_ratio09").innerHTML = load_ratio09;
+                document.getElementById("load_ratio08").innerHTML = load_ratio08;
+                document.getElementById("load_ratio07").innerHTML = load_ratio07;
+                document.getElementById("load_ratio06").innerHTML = load_ratio06;
+                document.getElementById("load_ratio05").innerHTML = load_ratio05;
+                document.getElementById("load_ratio04").innerHTML = load_ratio04;
+                document.getElementById("load_ratio03").innerHTML = load_ratio03;
+                document.getElementById("load_ratio02").innerHTML = load_ratio02;
+                document.getElementById("load_ratio01").innerHTML = load_ratio01;
+                document.getElementById("load_ratio0").innerHTML = load_ratio0;
+                document.getElementById("load_ratio1").innerHTML = load_ratio1;
+                document.getElementById("load_ratio2").innerHTML = load_ratio2;
+                document.getElementById("load_ratio3").innerHTML = load_ratio3;
+                document.getElementById("load_ratio4").innerHTML = load_ratio4;
+                document.getElementById("load_ratio5").innerHTML = load_ratio5;
+                document.getElementById("load_ratio6").innerHTML = load_ratio6;
+                document.getElementById("load_ratio7").innerHTML = load_ratio7;
+                document.getElementById("load_ratio8").innerHTML = load_ratio8;
+                document.getElementById("load_ratio9").innerHTML = load_ratio9;
+                document.getElementById("load_ratio10").innerHTML = load_ratio10;
+                document.getElementById("load_ratio11").innerHTML = load_ratio11;
+                document.getElementById("load_ratio12").innerHTML = load_ratio12;
+                document.getElementById("load_ratio13").innerHTML = load_ratio13;
+                document.getElementById("load_ratio14").innerHTML = load_ratio14;
+                document.getElementById("load_ratio15").innerHTML = load_ratio15;
+
+                //写入到表格（负荷）
+                load010 = load010.toFixed(2);
+                load09 = load09.toFixed(2);
+                load08 = load08.toFixed(2);
+                load07 = load07.toFixed(2);
+                load06 = load06.toFixed(2);
+                load05 = load05.toFixed(2);
+                load04 = load04.toFixed(2);
+                load03 = load03.toFixed(2);
+                load02 = load02.toFixed(2);
+                load01 = load01.toFixed(2);
+                load0 = load0.toFixed(2);
+                load1 = load1.toFixed(2);
+                load2 = load2.toFixed(2);
+                load3 = load3.toFixed(2);
+                load4 = load4.toFixed(2);
+                load5 = load5.toFixed(2);
+                load6 = load6.toFixed(2);
+                load7 = load7.toFixed(2);
+                load8 = load8.toFixed(2);
+                load9 = load9.toFixed(2);
+                load10 = load10.toFixed(2);
+                load11 = load11.toFixed(2);
+                load12 = load12.toFixed(2);
+                load13 = load13.toFixed(2);
+                load14 = load14.toFixed(2);
+                load15 = load15.toFixed(2);
+                document.getElementById("load010").innerHTML = load010;
+                document.getElementById("load09").innerHTML = load09;
+                document.getElementById("load08").innerHTML = load08;
+                document.getElementById("load07").innerHTML = load07;
+                document.getElementById("load06").innerHTML = load06;
+                document.getElementById("load05").innerHTML = load05;
+                document.getElementById("load04").innerHTML = load04;
+                document.getElementById("load03").innerHTML = load03;
+                document.getElementById("load02").innerHTML = load02;
+                document.getElementById("load01").innerHTML = load01;
+                document.getElementById("load0").innerHTML = load0;
+                document.getElementById("load1").innerHTML = load1;
+                document.getElementById("load2").innerHTML = load2;
+                document.getElementById("load3").innerHTML = load3;
+                document.getElementById("load4").innerHTML = load4;
+                document.getElementById("load5").innerHTML = load5;
+                document.getElementById("load6").innerHTML = load6;
+                document.getElementById("load7").innerHTML = load7;
+                document.getElementById("load8").innerHTML = load8;
+                document.getElementById("load9").innerHTML = load9;
+                document.getElementById("load10").innerHTML = load10;
+                document.getElementById("load11").innerHTML = load11;
+                document.getElementById("load12").innerHTML = load12;
+                document.getElementById("load13").innerHTML = load13;
+                document.getElementById("load14").innerHTML = load14;
+                document.getElementById("load15").innerHTML = load15;
+
+                //写入到表格（制热量）
+                heat010 = heat010.toFixed(2);
+                heat09 = heat09.toFixed(2);
+                heat08 = heat08.toFixed(2);
+                heat07 = heat07.toFixed(2);
+                heat06 = heat06.toFixed(2);
+                heat05 = heat05.toFixed(2);
+                heat04 = heat04.toFixed(2);
+                heat03 = heat03.toFixed(2);
+                heat02 = heat02.toFixed(2);
+                heat01 = heat01.toFixed(2);
+                heat0 = heat0.toFixed(2);
+                heat1 = heat1.toFixed(2);
+                heat2 = heat2.toFixed(2);
+                heat3 = heat3.toFixed(2);
+                heat4 = heat4.toFixed(2);
+                heat5 = heat5.toFixed(2);
+                heat6 = heat6.toFixed(2);
+                heat7 = heat7.toFixed(2);
+                heat8 = heat8.toFixed(2);
+                heat9 = heat9.toFixed(2);
+                heat10 = heat10.toFixed(2);
+                heat11 = heat11.toFixed(2);
+                heat12 = heat12.toFixed(2);
+                heat13 = heat13.toFixed(2);
+                heat14 = heat14.toFixed(2);
+                heat15 = heat15.toFixed(2);
+                document.getElementById("heat010").innerHTML = heat010;
+                document.getElementById("heat09").innerHTML = heat09;
+                document.getElementById("heat08").innerHTML = heat08;
+                document.getElementById("heat07").innerHTML = heat07;
+                document.getElementById("heat06").innerHTML = heat06;
+                document.getElementById("heat05").innerHTML = heat05;
+                document.getElementById("heat04").innerHTML = heat04;
+                document.getElementById("heat03").innerHTML = heat03;
+                document.getElementById("heat02").innerHTML = heat02;
+                document.getElementById("heat01").innerHTML = heat01;
+                document.getElementById("heat0").innerHTML = heat0;
+                document.getElementById("heat1").innerHTML = heat1;
+                document.getElementById("heat2").innerHTML = heat2;
+                document.getElementById("heat3").innerHTML = heat3;
+                document.getElementById("heat4").innerHTML = heat4;
+                document.getElementById("heat5").innerHTML = heat5;
+                document.getElementById("heat6").innerHTML = heat6;
+                document.getElementById("heat7").innerHTML = heat7;
+                document.getElementById("heat8").innerHTML = heat8;
+                document.getElementById("heat9").innerHTML = heat9;
+                document.getElementById("heat10").innerHTML = heat10;
+                document.getElementById("heat11").innerHTML = heat11;
+                document.getElementById("heat12").innerHTML = heat12;
+                document.getElementById("heat13").innerHTML = heat13;
+                document.getElementById("heat14").innerHTML = heat14;
+                document.getElementById("heat15").innerHTML = heat15;
+
+                //写入到表格（能效）
+                COP010 = COP010.toFixed(2);
+                COP09 = COP09.toFixed(2);
+                COP08 = COP08.toFixed(2);
+                COP07 = COP07.toFixed(2);
+                COP06 = COP06.toFixed(2);
+                COP05 = COP05.toFixed(2);
+                COP04 = COP04.toFixed(2);
+                COP03 = COP03.toFixed(2);
+                COP02 = COP02.toFixed(2);
+                COP01 = COP01.toFixed(2);
+                COP0 = COP0.toFixed(2);
+                COP1 = COP1.toFixed(2);
+                COP2 = COP2.toFixed(2);
+                COP3 = COP3.toFixed(2);
+                COP4 = COP4.toFixed(2);
+                COP5 = COP5.toFixed(2);
+                COP6 = COP6.toFixed(2);
+                COP7 = COP7.toFixed(2);
+                COP8 = COP8.toFixed(2);
+                COP9 = COP9.toFixed(2);
+                COP10 = COP10.toFixed(2);
+                COP11 = COP11.toFixed(2);
+                COP12 = COP12.toFixed(2);
+                COP13 = COP13.toFixed(2);
+                COP14 = COP14.toFixed(2);
+                COP15 = COP15.toFixed(2);
+                document.getElementById("COP010").innerHTML = COP010;
+                document.getElementById("COP09").innerHTML = COP09;
+                document.getElementById("COP08").innerHTML = COP08;
+                document.getElementById("COP07").innerHTML = COP07;
+                document.getElementById("COP06").innerHTML = COP06;
+                document.getElementById("COP05").innerHTML = COP05;
+                document.getElementById("COP04").innerHTML = COP04;
+                document.getElementById("COP03").innerHTML = COP03;
+                document.getElementById("COP02").innerHTML = COP02;
+                document.getElementById("COP01").innerHTML = COP01;
+                document.getElementById("COP0").innerHTML = COP0;
+                document.getElementById("COP1").innerHTML = COP1;
+                document.getElementById("COP2").innerHTML = COP2;
+                document.getElementById("COP3").innerHTML = COP3;
+                document.getElementById("COP4").innerHTML = COP4;
+                document.getElementById("COP5").innerHTML = COP5;
+                document.getElementById("COP6").innerHTML = COP6;
+                document.getElementById("COP7").innerHTML = COP7;
+                document.getElementById("COP8").innerHTML = COP8;
+                document.getElementById("COP9").innerHTML = COP9;
+                document.getElementById("COP10").innerHTML = COP10;
+                document.getElementById("COP11").innerHTML = COP11;
+                document.getElementById("COP12").innerHTML = COP12;
+                document.getElementById("COP13").innerHTML = COP13;
+                document.getElementById("COP14").innerHTML = COP14;
+                document.getElementById("COP15").innerHTML = COP15;
+
+                //写入到表格（设计负荷）
+                Pdesignh = Pdesignh.toFixed(3);
+                document.getElementById("Pdesignh").innerHTML = Pdesignh;
+
+                //写入到表格（COP修正）
+                COPbinTjA = COPbinTjA.toFixed(2);
+                COPbinTjB = COPbinTjB.toFixed(2);
+                COPbinTjC = COPbinTjC.toFixed(2);
+                COPbinTjD = COPbinTjD.toFixed(2);
+                COPbinTjE = COPbinTjE.toFixed(2);
+                document.getElementById("COPbinTjA").innerHTML = COPbinTjA;
+                document.getElementById("COPbinTjB").innerHTML = COPbinTjB;
+                document.getElementById("COPbinTjC").innerHTML = COPbinTjC;
+                document.getElementById("COPbinTjD").innerHTML = COPbinTjD;
+                document.getElementById("COPbinTjE").innerHTML = COPbinTjE;
+                document.getElementById("COPbinTjF").innerHTML = COPbinTjA;
+
+                COPdA = COPdA.toFixed(2);
+                COPdB = COPdB.toFixed(2);
+                COPdC = COPdC.toFixed(2);
+                COPdD = COPdD.toFixed(2);
+                COPdE = COPdE.toFixed(2);
+                document.getElementById("COPdA").innerHTML = COPdA;
+                document.getElementById("COPdB").innerHTML = COPdB;
+                document.getElementById("COPdC").innerHTML = COPdC;
+                document.getElementById("COPdD").innerHTML = COPdD;
+                document.getElementById("COPdE").innerHTML = COPdE;
+                document.getElementById("COPdF").innerHTML = COPdA;
+
+                CRA = CRA.toFixed(3);
+                CRB = CRB.toFixed(3);
+                CRC = CRC.toFixed(3);
+                CRD = CRD.toFixed(3);
+                CRE = CRE.toFixed(3);
+                document.getElementById("CRA").innerHTML = CRA;
+                document.getElementById("CRB").innerHTML = CRB;
+                document.getElementById("CRC").innerHTML = CRC;
+                document.getElementById("CRD").innerHTML = CRD;
+                document.getElementById("CRE").innerHTML = CRE;
+                document.getElementById("CRF").innerHTML = CRA;
+
+                plTjA = plTjA.toFixed(2);
+                plTjB = plTjB.toFixed(2);
+                plTjC = plTjC.toFixed(2);
+                plTjD = plTjD.toFixed(2);
+                plTjE = plTjE.toFixed(2);
+                document.getElementById("plTjA").innerHTML = plTjA;
+                document.getElementById("plTjB").innerHTML = plTjB;
+                document.getElementById("plTjC").innerHTML = plTjC;
+                document.getElementById("plTjD").innerHTML = plTjD;
+                document.getElementById("plTjE").innerHTML = plTjE;
+                document.getElementById("plTjF").innerHTML = plTjA;
+
+                PdhA = PdhA.toFixed(2);
+                PdhB = PdhB.toFixed(2);
+                PdhC = PdhC.toFixed(2);
+                PdhD = PdhD.toFixed(2);
+                PdhE = PdhE.toFixed(2);
+                document.getElementById("PdhA").innerHTML = PdhA;
+                document.getElementById("PdhB").innerHTML = PdhB;
+                document.getElementById("PdhC").innerHTML = PdhC;
+                document.getElementById("PdhD").innerHTML = PdhD;
+                document.getElementById("PdhE").innerHTML = PdhE;
+                document.getElementById("PdhF").innerHTML = PdhA;
+
+                //写入到表格（实际负荷）
+                loadA = loadA.toFixed(2);
+                loadB = loadB.toFixed(2);
+                loadC = loadC.toFixed(2);
+                loadD = loadD.toFixed(2);
+                loadE = loadE.toFixed(2);
+                document.getElementById("loadA").innerHTML = loadA + "%";
+                document.getElementById("loadB").innerHTML = loadB + "%";
+                document.getElementById("loadC").innerHTML = loadC + "%";
+                document.getElementById("loadD").innerHTML = loadD + "%";
+                document.getElementById("loadE").innerHTML = loadE + "%";
+                document.getElementById("loadF").innerHTML = loadA + "%";
+
+                //写入到表格（进度条）
+                //document.getElementById("meter1").innerHTML = SCOP ;
+                meter1.value = SCOP;
+
+                //写入到表格（过程计算）
+                QH = QH.toFixed(2);
+                document.getElementById("QH").innerHTML = QH;
+                QHE = QHE.toFixed(2);
+                document.getElementById("QHE").innerHTML = QHE;
+
+                //写入到表格（最终计算）
+                SCOPon = SCOPon.toFixed(3);
+                document.getElementById("SCOPon").innerHTML = SCOPon;
+                SCOP = SCOP.toFixed(3);
+                document.getElementById("SCOP").innerHTML = SCOP;
+                SCOPnet = SCOPnet.toFixed(3);
+                document.getElementById("SCOPnet").innerHTML = SCOPnet;
+
+                //写入到表格（效率、等级）
+                η = η.toFixed(1);
+                document.getElementById("η").innerHTML = η + "%";
+                document.getElementById("level").innerHTML = level;
+
+            });
+
+           save.addEventListener("click",function(){
+
+            // 使用 html2canvas 函数将指定的 DOM 元素（这里是 document.body，即整个页面）渲染为 canvas
+            html2canvas(document.body).then(function (canvas) {
+                // 创建一个 <a> 标签，用于实现图片下载
+                const link = document.createElement('a');
+                // 将 canvas 转换为 DataURL 格式的图片数据，并设置为 <a> 标签的 href 属性
+                link.href = canvas.toDataURL('image/png');
+                // 设置下载的文件名
+                link.download ='scop_data.png';
+                // 模拟点击 <a> 标签，触发下载操作
+                link.click();
+            });
+
+           });
+
+
+
+            //console.log( Pdesignh );
+            //获取本地时间
+            function updateLocalTime() {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const localTime = `${year} - ${month} - ${day}<br>${hours} : ${minutes}`;
+                document.getElementById('local-time').innerHTML = localTime;
+            }
+
+            // 每分钟更新一次时间
+            setInterval(updateLocalTime, 60 * 1000);
+            // 页面加载时立即更新一次时间
+            updateLocalTime();
+
+        </script>
+</body>
 </html>
